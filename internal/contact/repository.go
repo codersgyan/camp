@@ -16,7 +16,7 @@ func NewRepository(db *sql.DB) *Repository {
 	}
 }
 
-func (r *Repository) CreateOrUpsertTags(c *Contact) (int64, error) {
+func (r *Repository) CreateContactOrUpsertTags(c *Contact) (int64, error) {
 	existingContact, err := r.GetByEmail(c.Email)
 	if err != nil {
 		return 0, err

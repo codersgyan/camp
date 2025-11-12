@@ -26,7 +26,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	createdId, err := h.repo.CreateOrUpsertTags(&contactBody)
+	createdId, err := h.repo.CreateContactOrUpsertTags(&contactBody)
 	if err != nil {
 		resp := map[string]string{
 			"message": err.Error(),
