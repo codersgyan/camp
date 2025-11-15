@@ -1,0 +1,85 @@
+definitions:
+  contact.Contact:
+    properties:
+      created_at:
+        example: "2025-11-15T00:00:00Z"
+        type: string
+      email:
+        example: ava@example.com
+        type: string
+      first_name:
+        example: Krishna
+        type: string
+      id:
+        example: 0
+        type: integer
+      last_name:
+        example: Web
+        type: string
+      phone:
+        example: +1-555-0102
+        type: string
+      tags:
+        items:
+          $ref: '#/definitions/contact.Tag'
+        type: array
+      updated_at:
+        example: "2025-11-15T00:00:00Z"
+        type: string
+    type: object
+  contact.Tag:
+    properties:
+      created_at:
+        type: string
+      id:
+        example: 0
+        type: integer
+      text:
+        example: customers
+        type: string
+      updated_at:
+        example: "2025-11-15T00:00:00Z"
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/contacts:
+    post:
+      consumes:
+      - application/json
+      description: Upsert a contact record. If the email exists, tags are updated;
+        otherwise, a new contact is created.
+      parameters:
+      - description: Contact payload
+        in: body
+        name: contact
+        required: true
+        schema:
+          $ref: '#/definitions/contact.Contact'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              format: int64
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create or update a contact with tags
+      tags:
+      - Contacts
+swagger: "2.0"

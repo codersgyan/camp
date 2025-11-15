@@ -19,3 +19,21 @@ type Contact struct {
 	UpdatedAt time.Time `json:"updated_at"`
 	Tags      []Tag     `json:"tags"`
 }
+
+
+
+/**
+
+{
+  "first_name": "Krishna",
+  "last_name": "Bansal",
+  "email": "ava@example.com",
+  "phone": "+1-555-0102",
+  "tags": [
+    { "text": "customers" },
+    { "text": "newsletter" }
+  ]
+}
+
+use this data 
+  */

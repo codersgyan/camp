@@ -1,0 +1,125 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/api/contacts": {
+            "post": {
+                "description": "Upsert a contact record. If the email exists, tags are updated; otherwise, a new contact is created.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Create or update a contact with tags",
+                "parameters": [
+                    {
+                        "description": "Contact payload",
+                        "name": "contact",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/contact.Contact"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "contact.Contact": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string",
+                    "example": "2025-11-15T00:00:00Z"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "ava@example.com"
+                },
+                "first_name": {
+                    "type": "string",
+                    "example": "Krishna"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "last_name": {
+                    "type": "string",
+                    "example": "Web"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "+1-555-0102"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/contact.Tag"
+                    }
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2025-11-15T00:00:00Z"
+                }
+            }
+        },
+        "contact.Tag": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "text": {
+                    "type": "string",
+                    "example": "customers"
+                },
+                "updated_at": {
+                    "type": "string",
+                    "example": "2025-11-15T00:00:00Z"
+                }
+            }
+        }
+    }
+}
