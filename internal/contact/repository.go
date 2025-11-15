@@ -132,6 +132,118 @@ func (r *Repository) GetByEmail(email string) (*Contact, error) {
 	return &result, nil
 }
 
+// retrievess all contacts with their tags
+// optional pagination is also implemeteed
+func (r *Repository) GetAll(limit, offset int) ([]Contact, error) {
+	query := `
+		SELECT
+			id,
+			fname,
+			lname,
+			email,
+			phone,
+			created_at,
+			updated_at
+		FROM contacts
+		ORDER BY created_at DESC
+		LIMIT ? OFFSET ?
+	`
+
+	rows, err := r.db.Query(query, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query contacts: %w", err)
+	}
+	defer rows.Close()
+
+	var contacts []Contact
+	contactMap := make(map[int64]*Contact)
+
+	for rows.Next() {
+		var c Contact
+		err := rows.Scan(
+			&c.ID,
+			&c.FirstName,
+			&c.LastName,
+			&c.Email,
+			&c.Phone,
+			&c.CreatedAt,
+			&c.UpdatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan contact: %w", err)
+		}
+
+		// innitialize empty tags slice
+		c.Tags = []Tag{}
+		contacts = append(contacts, c)
+		contactMap[c.ID] = &contacts[len(contacts)-1]
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating contacts: %w", err)
+	}
+
+	// If no contacts found, return empty slice
+	if len(contacts) == 0 {
+		return contacts, nil
+	}
+
+	// Fetch tags for all contacts
+	contactIDs := make([]int64, 0, len(contacts))
+	for _, c := range contacts {
+		contactIDs = append(contactIDs, c.ID)
+	}
+
+	placeholders := make([]string, len(contactIDs))
+	args := make([]interface{}, len(contactIDs))
+	for i, id := range contactIDs {
+		placeholders[i] = "?"
+		args[i] = id
+	}
+
+	tagsQuery := fmt.Sprintf(`
+		SELECT
+			ct.contact_id,
+			t.id,
+			t.text,
+			t.created_at,
+			t.updated_at
+		FROM contact_tag ct
+		INNER JOIN tags t ON ct.tag_id = t.id
+		WHERE ct.contact_id IN (%s)`, strings.Join(placeholders, ","))
+
+	tagRows, err := r.db.Query(tagsQuery, args...)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query tags: %w", err)
+	}
+	defer tagRows.Close()
+
+	for tagRows.Next() {
+		var contactID int64
+		var tag Tag
+		err := tagRows.Scan(
+			&contactID,
+			&tag.ID,
+			&tag.Text,
+			&tag.CreatedAt,
+			&tag.UpdatedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan tag: %w", err)
+		}
+
+		if contact, exists := contactMap[contactID]; exists {
+			contact.Tags = append(contact.Tags, tag)
+		}
+	}
+
+	if err := tagRows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating tags: %w", err)
+	}
+
+	return contacts, nil
+}
+
 func insertTagIfNotExist(txn *sql.Tx, tags []Tag) error {
 	// todo: implement bulk inserts here
 	for _, tag := range tags {
