@@ -1,0 +1,3 @@
+[build]
+    cmd = "go build -o ./tmp/main ./cmd/camp"
+    bin = "./tmp/main"
