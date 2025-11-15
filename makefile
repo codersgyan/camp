@@ -3,8 +3,7 @@ run: build
 
 #  install---> go install github.com/air-verse/air@latest
 dev:
-	@command -v air >/dev/null 2>&1
-	@air
+	@PATH=$$HOME/go/bin:$$PATH air
 
 build:
 	@go build -o ./bin/camp cmd/camp/main.go
