@@ -1,0 +1,13 @@
+# Where Air should run your app
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o ./tmp/app ./cmd/camp"
+bin = "./tmp/app"
+include_ext = ["go"]
+exclude_dir = ["bin", "tmp", "vendor"]
+delay = 200
+
+[log]
+time = true

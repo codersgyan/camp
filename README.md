@@ -47,9 +47,16 @@ cp .env.example .env
 # Edit .env with your settings
 ```
 
-4. Run the application:
+4. Install Air (optional): [documentation](https://github.com/air-verse/air)
+
+5. Run the application (development mode):
 ```bash
 // make sure to install `make` before this.
+make dev
+```
+
+6. Run the application (production mode):
+```bash
 make run
 ```
 
