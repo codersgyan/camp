@@ -32,6 +32,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /api/contacts", contactHandler.Create)
+	mux.HandleFunc("GET /api/contacts", contactHandler.List)
 
 	// Configure server with timeouts
 	srv := &http.Server{
