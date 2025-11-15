@@ -23,7 +23,13 @@ func main() {
 	contactRepository := contact.NewRepository(db)
 	contactHandler := contact.NewHandler(contactRepository)
 
+<<<<<<< HEAD
 	http.HandleFunc("POST /api/contacts", contactHandler.Create)
+=======
+	mux := http.NewServeMux()
+	mux.HandleFunc("POST /api/contacts", contactHandler.Create)
+	mux.HandleFunc("GET /api/contacts", contactHandler.List)
+>>>>>>> 67b9709 (Add GET /api/contacts with pagination support)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
