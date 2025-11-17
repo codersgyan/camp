@@ -24,6 +24,7 @@ func main() {
 	contactHandler := contact.NewHandler(contactRepository)
 
 	http.HandleFunc("POST /api/contacts", contactHandler.Create)
+	http.HandleFunc("GET /api/contacts/{id}", contactHandler.GetByID)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
