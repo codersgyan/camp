@@ -141,7 +141,7 @@ func insertTagIfNotExist(txn *sql.Tx, tags []Tag) error {
 	args := make([]interface{}, len(tags))
 
 	for i, tag := range tags {
-		placeholders[i] = "?"
+		placeholders[i] = "(?)"
 		args[i] = tag.Text
 	}
 
