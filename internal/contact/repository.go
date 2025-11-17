@@ -133,12 +133,26 @@ func (r *Repository) GetByEmail(email string) (*Contact, error) {
 }
 
 func insertTagIfNotExist(txn *sql.Tx, tags []Tag) error {
-	// todo: implement bulk inserts here
-	for _, tag := range tags {
-		_, err := txn.Exec(`INSERT OR IGNORE INTO tags (text) VALUES (?)`, tag.Text)
-		if err != nil {
-			return fmt.Errorf("failed to insert tag: %w", err)
-		}
+	if len(tags) == 0 {
+		return nil
+	}
+
+	placeholders := make([]string, len(tags))
+	args := make([]interface{}, len(tags))
+
+	for i, tag := range tags {
+		placeholders[i] = "?"
+		args[i] = tag.Text
+	}
+
+	query := fmt.Sprintf(
+		`INSERT OR IGNORE INTO tags (text) VALUES %s`,
+		strings.Join(placeholders, ", "),
+	)
+
+	_, err := txn.Exec(query, args...)
+	if err != nil {
+		return fmt.Errorf("failed to bulk insert tags: %w", err)
 	}
 
 	return nil
