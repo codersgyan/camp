@@ -20,6 +20,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// this is the implementation of graceful shutdown
+
 	contactRepository := contact.NewRepository(db)
 	contactHandler := contact.NewHandler(contactRepository)
 
