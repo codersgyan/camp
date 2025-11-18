@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/codersgyan/camp/internal/contact"
+	"github.com/codersgyan/camp/internal/api/routes"
 	"github.com/codersgyan/camp/internal/database"
 )
 
@@ -20,10 +20,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	contactRepository := contact.NewRepository(db)
-	contactHandler := contact.NewHandler(contactRepository)
+	apiRoutes := routes.Register(db)
 
-	http.HandleFunc("POST /api/contacts", contactHandler.Create)
-
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", apiRoutes))
 }
