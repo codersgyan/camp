@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 type Handler struct {
@@ -42,4 +43,33 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		"id": createdId,
 	}
 	json.NewEncoder(w).Encode(resp)
+}
+
+func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+	if idStr == "" {
+		http.Error(w, "missing contact id", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "invalid contact id", http.StatusBadRequest)
+		return
+	}
+
+	contact, err := h.repo.GetContactByID(id)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	if contact == nil {
+		http.Error(w, "contact not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(contact)
 }

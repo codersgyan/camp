@@ -221,3 +221,73 @@ func createContact(txn *sql.Tx, c *Contact) (int64, error) {
 
 	return lastId, nil
 }
+
+func (r *Repository) GetContactByID(id int64) (*Contact, error) {
+	query := `
+		SELECT
+			id,
+			fname,
+			lname,
+			email,
+			phone,
+			created_at,
+			updated_at
+		FROM contacts
+		WHERE id = ?
+		LIMIT 1
+`
+
+	var contact Contact
+	err := r.db.QueryRow(query, id).Scan(
+		&contact.ID,
+		&contact.FirstName,
+		&contact.LastName,
+		&contact.Email,
+		&contact.Phone,
+		&contact.CreatedAt,
+		&contact.UpdatedAt,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to get contact: %w", err)
+	}
+
+	tagsQuery := `
+		SELECT
+			t.id,
+			t.text,
+			t.created_at,
+			t.updated_at
+		FROM tags t
+		INNER JOIN contact_tag ct
+		ON t.id = ct.tag_id
+		WHERE ct.contact_id = ?
+`
+
+	rows, err := r.db.Query(tagsQuery, id)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get tags: %w", err)
+	}
+	defer rows.Close()
+
+	var tags []Tag
+	for rows.Next() {
+		var tag Tag
+		if err := rows.Scan(&tag.ID, &tag.Text, &tag.CreatedAt, &tag.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("failed to scan tag: %w", err)
+		}
+		tags = append(tags, tag)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating tags: %w", err)
+	}
+
+	contact.Tags = tags
+
+	return &contact, nil
+}
