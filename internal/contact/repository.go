@@ -222,7 +222,7 @@ func createContact(txn *sql.Tx, c *Contact) (int64, error) {
 	return lastId, nil
 }
 
-func (r *Repository) GetByID(id int64) (*Contact, error) {
+func (r *Repository) GetContactByID(id int64) (*Contact, error) {
 	query := `
 		SELECT
 			id,

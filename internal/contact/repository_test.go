@@ -180,7 +180,7 @@ func TestContactRepositoryGetByID(t *testing.T) {
 			t.Fatalf("Failed to create contact: %v", err)
 		}
 
-		retrievedContact, err := repo.GetByID(id)
+		retrievedContact, err := repo.GetContactByID(id)
 		if err != nil {
 			t.Fatalf("Failed to get contact by ID: %v", err)
 		}
@@ -220,7 +220,7 @@ func TestContactRepositoryGetByID(t *testing.T) {
 	})
 
 	t.Run("non-existing contact with negative ID", func(t *testing.T) {
-		notFound, err := repo.GetByID(-1)
+		notFound, err := repo.GetContactByID(-1)
 		if err != nil {
 			t.Fatalf("Expected no error for non-existing contact, got: %v", err)
 		}
@@ -230,7 +230,7 @@ func TestContactRepositoryGetByID(t *testing.T) {
 	})
 
 	t.Run("non-existing contact with zero ID", func(t *testing.T) {
-		notFound, err := repo.GetByID(0)
+		notFound, err := repo.GetContactByID(0)
 		if err != nil {
 			t.Fatalf("Expected no error for non-existing contact, got: %v", err)
 		}
@@ -240,7 +240,7 @@ func TestContactRepositoryGetByID(t *testing.T) {
 	})
 
 	t.Run("non-existing contact with large ID", func(t *testing.T) {
-		notFound, err := repo.GetByID(999999)
+		notFound, err := repo.GetContactByID(999999)
 		if err != nil {
 			t.Fatalf("Expected no error for non-existing contact, got: %v", err)
 		}

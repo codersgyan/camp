@@ -58,7 +58,7 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	contact, err := h.repo.GetByID(id)
+	contact, err := h.repo.GetContactByID(id)
 	if err != nil {
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
