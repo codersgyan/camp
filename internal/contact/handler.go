@@ -15,19 +15,38 @@ func NewHandler(repo *Repository) *Handler {
 }
 
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
+	var payload ContactCreateRequest
+	var repoTags []Tag
 
-	// todo: request validation
-	var contactBody Contact
-
-	if err := json.NewDecoder(r.Body).Decode(&contactBody); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		fmt.Println(err)
 		http.Error(w, "invalid json", http.StatusBadRequest)
 		return
 	}
 
+	if errs := payload.Validate(); len(errs) > 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string][]ValidationError{"errors": errs})
+		return
+	}
+	// conversion from request type to model type
+	for _, t := range payload.Tags {
+		repoTags = append(repoTags, Tag{
+			Text: t.Text,
+		})
+	}
+
+	contact := Contact{
+		FirstName: payload.FirstName,
+		LastName:  payload.LastName,
+		Email:     payload.Email,
+		Phone:     payload.Phone,
+		Tags:      repoTags,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 
-	createdId, err := h.repo.CreateContactOrUpsertTags(&contactBody)
+	createdId, err := h.repo.CreateContactOrUpsertTags(&contact)
 	if err != nil {
 		resp := map[string]string{
 			"message": "Internal server error",
