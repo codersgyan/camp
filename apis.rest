@@ -1,16 +1,64 @@
 @base_url = http://localhost:8080
 
-
-### Create a contact
+### Create Contact – Valid Request
 POST {{base_url}}/api/contacts
 Content-Type: application/json
 
 {
   "first_name": "Rakesh",
-  "last_name": "K",
-  "email": "rakesh@codersgyan.com",
+  "last_name":  "K",
+  "email":      "rakesh@codersgyan.com",
+  "phone":      "+919876543210",
   "tags": [
     { "text": "purchased:mern" },
-    {"text": "purchased:devops"}
+    { "text": "purchased:devops" }
   ]
 }
+
+> {%
+  client.test("Request executed successfully", function() {
+    client.assert(response.status === 201, "Expected 201 Created");
+    client.assert(response.body.includes('"id":'), "Response should contain created contact ID");
+  });
+%}
+
+### Create Contact – Validation Errors (400)
+POST {{base_url}}/api/contacts
+Content-Type: application/json
+
+{
+  "first_name": "",
+  "last_name":  "D",
+  "email":      "not-an-email",
+  "phone":      "12345",
+  "tags": []
+}
+
+> {%
+  client.test("Returns 400 with validation errors", function() {
+    client.assert(response.status === 400, "Expected 400 Bad Request");
+    const body = response.body;
+    client.assert(body.includes("first_name") && body.includes("required"), "Missing first_name required error");
+    client.assert(body.includes("invalid email format"), "Missing email format error");
+    client.assert(body.includes("phone"), "Missing phone validation error");
+  });
+%}
+
+### POST /api/contacts – Validation Rules
+# Required fields:
+# - first_name → max 100 characters
+# - last_name  → max 100 characters  
+# - email      → valid format, max 255 characters
+#
+# Optional:
+# - phone → if provided, must be valid international number
+#           → automatically normalized to E.164 (e.g. +919876543210)
+# - tags  → array of { "text": "your-tag" }
+#
+# Error response format (400):
+# {
+#   "errors": [
+#     { "field": "email", "message": "required" },
+#     { "field": "email", "message": "invalid email format" }
+#   ]
+# }
