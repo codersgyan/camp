@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 type Handler struct {
@@ -25,6 +26,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	time.Sleep(time.Second * 10)
 	w.Header().Set("Content-Type", "application/json")
 
 	createdId, err := h.repo.CreateContactOrUpsertTags(&contactBody)
